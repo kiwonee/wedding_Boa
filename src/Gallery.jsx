@@ -3,15 +3,20 @@ import Modal from "./modal";
 
 const modules = import.meta.glob(
   "./assets/images/*.{png,PNG,jpg,JPG,jpeg,JPEG,webp,WEBP}",
-  { eager: true, import: "default" }
+  { eager: true, import: "default", query: "?w=800&format=webp&as=url" }
 );
 
 const SCROLL_MS = 520;
 
-// 파일명 번호로 레이아웃 지정: span2 = 가로 2칸
-const SPAN2 = [2, 5, 8]; // 원하는 번호
-
 const getNum = (path) => parseInt(path.split("/").pop().split(".")[0], 10);
+
+// 6열 그리드 기준 span 지정
+// 1~3: span2(3열), 4~7: span3(2열), 8~16: span2(3열), 17~19: span6(1열)
+const getSpanClass = (num) => {
+  if (num >= 17) return "span6";
+  if (num >= 4 && num <= 7) return "span3";
+  return "span2";
+};
 
 const Gallery = () => {
   const [allImages, setAllImages] = useState([]);
@@ -26,17 +31,17 @@ const Gallery = () => {
 
   useEffect(() => {
     const loaded = Object.entries(modules)
+      .filter(([path]) => !isNaN(parseInt(path.split("/").pop().split(".")[0], 10)))
       .map(([path, src]) => ({ path, src }))
       .sort((a, b) => {
         const ai = parseInt(a.path.split("/").pop().split(".")[0], 10);
         const bi = parseInt(b.path.split("/").pop().split(".")[0], 10);
-        if (!isNaN(ai) && !isNaN(bi)) return ai - bi;
-        return a.path.localeCompare(b.path);
+        return ai - bi;
       });
     setAllImages(loaded);
   }, []);
 
-  const PREVIEW = 9;
+  const PREVIEW = 5;
   const visible = useMemo(
     () => (expanded ? allImages : allImages.slice(0, PREVIEW)),
     [expanded, allImages]
@@ -87,21 +92,29 @@ const Gallery = () => {
   useEffect(() => {
     const el = trackRef.current;
     if (!el || !modal.isopen || n === 0) return;
-    let t = null;
-    const onScroll = () => {
-      if (isAnimRef.current) return;
-      if (animRef.current) { clearTimeout(animRef.current); animRef.current = null; }
-      clearTimeout(t);
-      t = setTimeout(() => {
-        const w = el.offsetWidth;
-        const idx = Math.round(el.scrollLeft / w);
-        if (idx <= 0) { el.scrollLeft = n * w; dispIdxRef.current = n; setDispIdx(n); }
-        else if (idx >= n + 1) { el.scrollLeft = w; dispIdxRef.current = 1; setDispIdx(1); }
-        else { dispIdxRef.current = idx; setDispIdx(idx); }
-      }, 30);
+
+    let startX = null;
+
+    const onTouchStart = (e) => {
+      startX = e.touches[0].clientX;
+      e.preventDefault();
     };
-    el.addEventListener("scroll", onScroll, { passive: true });
-    return () => { el.removeEventListener("scroll", onScroll); clearTimeout(t); };
+
+    const onTouchEnd = (e) => {
+      if (startX === null) return;
+      const dx = e.changedTouches[0].clientX - startX;
+      startX = null;
+      if (Math.abs(dx) > 40) {
+        animateTo(dispIdxRef.current + (dx < 0 ? 1 : -1));
+      }
+    };
+
+    el.addEventListener("touchstart", onTouchStart, { passive: false });
+    el.addEventListener("touchend", onTouchEnd);
+    return () => {
+      el.removeEventListener("touchstart", onTouchStart);
+      el.removeEventListener("touchend", onTouchEnd);
+    };
   }, [modal.isopen, n]);
 
   const goPrev = () => animateTo(dispIdxRef.current - 1);
@@ -123,11 +136,11 @@ const Gallery = () => {
         <>
           <div className="gallery-grid">
             {visible.map((img, idx) => {
-              const isSpan2 = SPAN2.includes(getNum(img.path));
+              const spanClass = getSpanClass(getNum(img.path));
               return (
                 <button
                   key={img.path}
-                  className={`gallery-item${isSpan2 ? " span2" : ""}`}
+                  className={`gallery-item ${spanClass}`}
                   onClick={() => setModal({ isopen: true, idx })}
                   type="button"
                 >
@@ -149,12 +162,9 @@ const Gallery = () => {
         </>
       )}
 
-      <Modal isOpen={modal} onClose={() => setModal({ isopen: false, idx: 0 })}>
+      <Modal isOpen={modal} onClose={() => setModal({ isopen: false, idx: 0 })} fullscreen>
         <div className="gv">
-          <div className="gv-top">
-            <div className="gv-count">{realIdx + 1} / {n}</div>
-            <button className="gv-close" onClick={() => setModal({ isopen: false, idx: 0 })} type="button">✕</button>
-          </div>
+          <button className="gv-close" onClick={() => setModal({ isopen: false, idx: 0 })} type="button">✕</button>
           <div className="gv-track" ref={trackRef}>
             {slides.map((img, i) => (
               <div className="gv-slide" key={`${img.path}-${i}`}>
@@ -162,8 +172,11 @@ const Gallery = () => {
               </div>
             ))}
           </div>
-          <button className="gv-nav prev" onClick={goPrev} type="button">‹</button>
-          <button className="gv-nav next" onClick={goNext} type="button">›</button>
+          <div className="gv-bottom">
+            <button className="gv-nav prev" onClick={goPrev} type="button">‹</button>
+            <div className="gv-count">{realIdx + 1} / {n}</div>
+            <button className="gv-nav next" onClick={goNext} type="button">›</button>
+          </div>
         </div>
       </Modal>
     </div>

@@ -6,7 +6,6 @@ import CalendarSection from "./CalendarSection";
 import Gallery from "./Gallery";
 import Location from "./Location";
 import Account from "./Account";
-import RSVP from "./RSVP";
 import ShareBar from "./ShareBar";
 import Footer from "./Footer";
 
@@ -23,8 +22,6 @@ function App() {
       <Intersect><Location /></Intersect>
       <div className="dim-divider" />
       <Intersect><Account /></Intersect>
-      <div className="dim-divider" />
-      <Intersect><RSVP /></Intersect>
       <div className="dim-divider" />
       <Intersect><ShareBar /></Intersect>
       <Footer />

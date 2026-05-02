@@ -1,6 +1,7 @@
 const Footer = () => (
   <footer className="footer">
-    Made with ♥
+    <p style={{ margin: "0 0 4px" }}>@2026 Kiwonee</p>
+    <p style={{ margin: 0 }}>Designed &amp; Built by Kiwonee</p>
   </footer>
 );
 

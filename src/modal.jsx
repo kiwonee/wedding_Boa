@@ -43,6 +43,7 @@ const Modal = ({
   children,
   mystyle = {},
   closeOnBackdrop = true,
+  fullscreen = false,
 }) => {
   const open = !!isOpen?.isopen;
 
@@ -60,6 +61,13 @@ const Modal = ({
   }, [open, onClose]);
 
   if (!open) return null;
+
+  if (fullscreen) {
+    return createPortal(
+      <div className="modal-fullscreen">{children}</div>,
+      document.body
+    );
+  }
 
   return createPortal(
     <div

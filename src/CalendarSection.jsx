@@ -92,13 +92,15 @@ const CalendarSection = () => {
       <div className="cal-parents">
         <div className="cal-parents-row">
           <span className="cal-parents-name">이태호 · 장순자</span>
-          <span className="cal-parents-child">의 아들</span>
+          <span className="cal-parents-ui">의</span>
+          <span className="cal-parents-child">아들</span>
           <span className="cal-parents-role">신랑</span>
           <span className="cal-parents-member">인철</span>
         </div>
         <div className="cal-parents-row">
           <span className="cal-parents-name">김철수(수철) · 장미순</span>
-          <span className="cal-parents-child">의 딸</span>
+          <span className="cal-parents-ui">의</span>
+          <span className="cal-parents-child">딸</span>
           <span className="cal-parents-role">신부</span>
           <span className="cal-parents-member">보아</span>
         </div>

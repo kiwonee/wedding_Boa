@@ -20,18 +20,18 @@ const ACCOUNTS = [
     id: "groom",
     label: "신랑측 계좌번호",
     rows: [
-      { name: "신랑 아버지", bank: "은행명", num: "계좌번호" },
-      { name: "신랑 어머니", bank: "은행명", num: "계좌번호" },
-      { name: "신랑",       bank: "은행명", num: "계좌번호" },
+      { name: "신랑 아버지", bank: "농협은행",   num: "33504152089740" },
+      { name: "신랑 어머니", bank: "농협은행",   num: "10602204944" },
+      { name: "신랑",        bank: "카카오뱅크", num: "3333213215225" },
     ],
   },
   {
     id: "bride",
     label: "신부측 계좌번호",
     rows: [
-      { name: "신부 아버지", bank: "은행명", num: "계좌번호" },
-      { name: "신부 어머니", bank: "은행명", num: "계좌번호" },
-      { name: "신부",       bank: "은행명", num: "계좌번호" },
+      { name: "신부 아버지", bank: "우리은행",   num: "1002964375218" },
+      { name: "신부 어머니", bank: "국민은행",   num: "099240069010" },
+      { name: "신부",        bank: "카카오뱅크", num: "3333370983633" },
     ],
   },
 ];
@@ -78,7 +78,7 @@ const Account = () => {
   return (
     <div className="account-wrap">
       <div className="account-head">
-        <div className="section-en">Account</div>
+        <div className="section-en gallery-title">Account</div>
       </div>
 
       {ACCOUNTS.map((acc) => (
